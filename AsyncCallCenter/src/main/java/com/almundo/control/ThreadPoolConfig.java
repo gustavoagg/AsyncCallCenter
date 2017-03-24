@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
   
 @Configuration
-public class ThreatPoolConfig {
+public class ThreadPoolConfig {
       
     @Value("${threadpool.corepoolsize}")
     int corePoolSize;
