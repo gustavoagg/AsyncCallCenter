@@ -3,42 +3,44 @@ package com.almundo.control;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 
-import com.almundo.model.Employee;
 import com.almundo.model.Call;
+import com.almundo.model.Worker;
 
-public class CallableWorker implements Callable<CallableWorker> {
+public class DispatchWorker implements Callable<DispatchWorker> {
 
 	String id;
-	Employee employee;
+	Worker worker;
 	Call call;
 	boolean ready;
 	Queue<Call> incomingCalls;
+	Queue<Worker> freeWorkers;
 
-	public CallableWorker(int id) {
+	public DispatchWorker(int id) {
 		ready = true;
 
 	}
 
-	public CallableWorker(Employee empleado, Call llamada) {
-		this.employee = empleado;
+	public DispatchWorker(Worker worker, Call llamada) {
+		this.worker = worker;
 		this.call = llamada;
 
 	}
 
-	public CallableWorker(Employee empleado) {
-		this.employee = empleado;
+	public DispatchWorker(Worker worker) {
+		this.worker = worker;
 
 	}
 
-	public CallableWorker(String id, Queue<Call> incomingCalls) {
+	public DispatchWorker(String id, Queue<Call> incomingCalls, Queue<Worker> workerList) {
 		this.id = id;
 		this.incomingCalls = incomingCalls;
+		this.freeWorkers = workerList;
 	}
 
 	@Override
-	public CallableWorker call() throws Exception {
+	public DispatchWorker call() throws Exception {
 		process();
-		// String message = String.format("Empleado: %s Termino su llamada",
+		// String message = String.format("worker: %s Termino su llamada",
 		// employee.getName());
 		return this;
 	}
@@ -47,7 +49,7 @@ public class CallableWorker implements Callable<CallableWorker> {
 		while (true) {
 			if ((this.call = incomingCalls.poll()) != null) {
 				ready = false;
-				String message = String.format("Empleado: %s esta atendiendo a la llamada: %s por la linea %s", "admin",
+				String message = String.format("worker: %s esta atendiendo a la llamada: %s por la linea %s", "admin",
 						call.getId(), id);
 				System.out.println(message);
 				Thread.sleep(call.getTiempo());

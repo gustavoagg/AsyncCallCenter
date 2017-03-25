@@ -1,15 +1,19 @@
 package com.almundo.model;
 
-public class Operator implements Employee {
-
-	final int nivel = 1;
+public class Worker implements Comparable<Worker> {
 
 	private String name;
-	
+
 	private int totalLlamadas;
 
-	public Operator(String valueOf) {
-		this.name = valueOf;
+	private int nivel;
+
+	public int getNivel() {
+		return nivel;
+	}
+
+	public void setNivel(int nivel) {
+		this.nivel = nivel;
 	}
 
 	public String getName() {
@@ -24,16 +28,19 @@ public class Operator implements Employee {
 		return totalLlamadas;
 	}
 
-	public int getNivel() {
-		return nivel;
-	}
-
 	public void setTotalLlamadas(int totalLlamadas) {
 		this.totalLlamadas = totalLlamadas;
 	}
 
 	public void sumarLlamada() {
-		totalLlamadas++;		
+		this.totalLlamadas++;
 	}
 
+	public int compareTo(Worker e) {
+		int result = this.nivel - e.getNivel();
+		if (result == 0) {
+			result = this.getTotalLlamadas() - e.getTotalLlamadas();
+		}
+		return result;
+	}
 }

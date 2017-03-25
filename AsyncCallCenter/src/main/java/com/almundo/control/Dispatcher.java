@@ -2,7 +2,6 @@ package com.almundo.control;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 
@@ -11,23 +10,27 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 
 import com.almundo.model.Call;
-import com.almundo.model.Operator;
+import com.almundo.model.Worker;
 
 @Controller
 public class Dispatcher {
 
 	@Autowired
 	ThreadPoolTaskExecutor threadPool;
+
+	List<Future<DispatchWorker>> futureList;
+
 	ConcurrentLinkedQueue<Call> incomingCalls = new ConcurrentLinkedQueue<Call>();
-	List<Future<CallableWorker>> futureList;
+
+	ConcurrentLinkedQueue<Worker> workerList = new ConcurrentLinkedQueue<Worker>();
 
 	public void init() {
 		futureList = new ArrayList<>();
 
 		for (int threadNumber = 1; threadNumber < 11; threadNumber++) {
-			CallableWorker callableTask = new CallableWorker(String.valueOf(threadNumber), incomingCalls);
+			DispatchWorker callableTask = new DispatchWorker(String.valueOf(threadNumber), incomingCalls, workerList);
 			callableTask.ready = true;
-			Future<CallableWorker> result = threadPool.submit(callableTask);
+			Future<DispatchWorker> result = threadPool.submit(callableTask);
 			futureList.add(result);
 			System.out.println("Created Line: " + threadNumber + " ..waiting for calls");
 		}
@@ -39,22 +42,9 @@ public class Dispatcher {
 		incomingCalls.add(call);
 	}
 
-	public String dispatchAll() {
-		String msg = "";
-		List<Future<CallableWorker>> futureList = new ArrayList<>();
-		for (int threadNumber = 0; threadNumber < 12; threadNumber++) {
-			CallableWorker callableTask = new CallableWorker(new Operator(String.valueOf(threadNumber)));
-			Future<CallableWorker> result = threadPool.submit(callableTask);
-			futureList.add(result);
-		}
+	public synchronized Worker getNextInLine() {
 
-		for (Future<CallableWorker> future : futureList) {
-			try {
-				msg += future.get().employee.getName() + "#####";
-			} catch (Exception e) {
-			}
-		}
-
-		return msg;
+		return workerList.poll();
 	}
+
 }
