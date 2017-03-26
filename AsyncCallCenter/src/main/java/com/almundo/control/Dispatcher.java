@@ -3,6 +3,7 @@ package com.almundo.control;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -24,23 +25,20 @@ public class Dispatcher {
 
 	ConcurrentLinkedQueue<Call> incomingCalls = new ConcurrentLinkedQueue<Call>();
 
-	ConcurrentLinkedQueue<Worker> workerList;
+	PriorityBlockingQueue<Worker> workerList;
 
 	List<LineStatusBean> statusBeans = new ArrayList<LineStatusBean>();
 
 	public void init() {
 
-		workerList = new ConcurrentLinkedQueue<Worker>(workerService.findAllWorkers());
+		workerList = new PriorityBlockingQueue<Worker>(workerService.findAllWorkers());
 		for (int threadNumber = 0; threadNumber < 10; threadNumber++) {
 			statusBeans.add(new LineStatusBean());
 			DispatchWorker callableTask = new DispatchWorker(threadNumber, incomingCalls, workerList, statusBeans);
-			//callableTask.ready = true;
-			// Future<DispatchWorker> result =
 			threadPool.submit(callableTask);
 			
 			System.out.println("Created Line: " + threadNumber + " ..waiting for calls");
 		}
-
 	}
 
 	public void dispatchCall(Call call) {

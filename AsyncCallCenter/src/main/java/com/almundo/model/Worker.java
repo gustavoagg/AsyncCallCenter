@@ -14,15 +14,15 @@ public class Worker implements Comparable<Worker> {
 	
 	private String name;
 
-	private int calls;
+	private Integer calls;
 
-	private int level;
+	private Integer level;
 
-	public int getLevel() {
+	public Integer getLevel() {
 		return level;
 	}
 
-	public void setLevel(int level) {
+	public void setLevel(Integer level) {
 		this.level = level;
 	}
 
@@ -34,11 +34,11 @@ public class Worker implements Comparable<Worker> {
 		this.name = name;
 	}
 
-	public int getCalls() {
+	public Integer getCalls() {
 		return calls;
 	}
 
-	public void setCalls(int calls) {
+	public void setCalls(Integer calls) {
 		this.calls = calls;
 	}
 
@@ -47,10 +47,16 @@ public class Worker implements Comparable<Worker> {
 	}
 
 	public int compareTo(Worker e) {
-		int result = this.level - e.getLevel();
+		int result = this.level.compareTo(e.getLevel());
 		if (result == 0) {
-			result = this.getCalls() - e.getCalls();
+			result = this.getCalls().compareTo(e.getCalls());
 		}
 		return result;
+	}
+	
+	public String toString(){
+		
+		return id+ ": "+name.toString()+" - ("+calls.toString()+"-"+level.toString()+")";
+		
 	}
 }

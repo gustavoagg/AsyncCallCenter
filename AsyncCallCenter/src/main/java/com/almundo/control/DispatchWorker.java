@@ -1,8 +1,9 @@
 package com.almundo.control;
 
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import com.almundo.bean.LineStatusBean;
 import com.almundo.model.Call;
@@ -12,11 +13,11 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 
 	int id;
 	Worker worker;
-	Call call = null;
-	// boolean ready = true;
+	Call call = null;	
 	boolean stop = false;
-	Queue<Call> incomingCalls;
-	Queue<Worker> freeWorkers;
+	
+	ConcurrentLinkedQueue<Call> incomingCalls;
+	PriorityBlockingQueue<Worker> freeWorkers;
 	List<LineStatusBean> status;
 
 	public enum LineStatus {
@@ -29,7 +30,7 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 		}
 	}
 
-	public DispatchWorker(int threadNumber, Queue<Call> incomingCalls, Queue<Worker> workerList,
+	public DispatchWorker(int threadNumber, ConcurrentLinkedQueue<Call> incomingCalls, PriorityBlockingQueue<Worker> workerList,
 			List<LineStatusBean> status) {
 		this.id = threadNumber;
 		this.incomingCalls = incomingCalls;
@@ -57,7 +58,6 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 				disconnect();
 
 			} else {
-				// System.out.println("waiting... " + id);
 				Thread.sleep(1000);// delay time to retake another call if
 									// necessary
 			}
@@ -78,12 +78,18 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 
 	private void disconnect() {
 		this.call = null;
-		if (this.worker != null)
-			freeWorkers.add(this.worker);
-		this.worker = null;
+		workerToQueueList();
 		// ready = true;
 		updateStatus(LineStatus.READY.text);
 
+	}
+
+	private void workerToQueueList() {
+		if (this.worker != null){
+			this.worker.setCalls(Integer.valueOf(this.worker.getCalls().intValue()+1));
+			freeWorkers.add(this.worker);			
+		}
+		this.worker = null;
 	}
 
 	private void updateStatus(String status) {
