@@ -1,19 +1,29 @@
 package com.almundo.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class Worker implements Comparable<Worker> {
 
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private long id;
+	
 	private String name;
 
-	private int totalLlamadas;
+	private int calls;
 
-	private int nivel;
+	private int level;
 
-	public int getNivel() {
-		return nivel;
+	public int getLevel() {
+		return level;
 	}
 
-	public void setNivel(int nivel) {
-		this.nivel = nivel;
+	public void setLevel(int level) {
+		this.level = level;
 	}
 
 	public String getName() {
@@ -24,22 +34,22 @@ public class Worker implements Comparable<Worker> {
 		this.name = name;
 	}
 
-	public int getTotalLlamadas() {
-		return totalLlamadas;
+	public int getCalls() {
+		return calls;
 	}
 
-	public void setTotalLlamadas(int totalLlamadas) {
-		this.totalLlamadas = totalLlamadas;
+	public void setCalls(int calls) {
+		this.calls = calls;
 	}
 
 	public void sumarLlamada() {
-		this.totalLlamadas++;
+		this.calls++;
 	}
 
 	public int compareTo(Worker e) {
-		int result = this.nivel - e.getNivel();
+		int result = this.level - e.getLevel();
 		if (result == 0) {
-			result = this.getTotalLlamadas() - e.getTotalLlamadas();
+			result = this.getCalls() - e.getCalls();
 		}
 		return result;
 	}

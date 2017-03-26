@@ -27,8 +27,8 @@ public class WebCallController {
 	public ResponseEntity<List<LineStatusBean>> process() {
 
 		dispatcher.init();
-
-		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatus(), HttpStatus.OK);
+		makeCalls(20);
+		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatusBeans(), HttpStatus.OK);
 
 	}
 	
@@ -37,7 +37,7 @@ public class WebCallController {
 
 		
 
-		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatus(), HttpStatus.OK);
+		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatusBeans(), HttpStatus.OK);
 
 	}
 
@@ -47,7 +47,7 @@ public class WebCallController {
 		for (int i = 0; i < calls; i++) {
 			message = message + addCall() + "<br />";
 		}
-		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatus(), HttpStatus.OK);
+		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatusBeans(), HttpStatus.OK);
 
 	}
 

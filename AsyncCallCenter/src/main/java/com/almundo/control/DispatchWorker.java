@@ -12,12 +12,22 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 
 	int id;
 	Worker worker;
-	Call call;
-	boolean ready = true;
+	Call call = null;
+	// boolean ready = true;
 	boolean stop = false;
 	Queue<Call> incomingCalls;
 	Queue<Worker> freeWorkers;
 	List<LineStatusBean> status;
+
+	public enum LineStatus {
+		ON_HOLD("On Hold"), CONNECTING("Connecting"), READY("Ready"), CLOSED("Closed"), BUSY("Busy");
+
+		public String text;
+
+		LineStatus(String text) {
+			this.text = text;
+		}
+	}
 
 	public DispatchWorker(int threadNumber, Queue<Call> incomingCalls, Queue<Worker> workerList,
 			List<LineStatusBean> status) {
@@ -29,36 +39,54 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 
 	@Override
 	public DispatchWorker call() throws Exception {
-		updateStatus();
+		updateStatus(LineStatus.CONNECTING.text);
+
 		while (!stop) {
+			// Go until app closes, or if its needed to pause the threads
 			if ((this.call = incomingCalls.poll()) != null) {
-				process();
+				// if there is an incoming call
+				updateStatus(LineStatus.ON_HOLD.text);
+				while (this.worker == null) {
+					// wait until there is a free worker to take the call
+					if ((this.worker = this.freeWorkers.poll()) != null) {
+						// connect an process the call
+						process();
+					}
+				}
+				// when finish the call, disconnect and free the worker
+				disconnect();
+
 			} else {
-				System.out.println("waiting... " + id);
-				Thread.sleep(3000);
+				// System.out.println("waiting... " + id);
+				Thread.sleep(1000);// delay time to retake another call if
+									// necessary
 			}
 		}
-		// String message = String.format("worker: %s Termino su llamada",
-		// employee.getName());
+		updateStatus(LineStatus.CLOSED.text);
 		return this;
 	}
 
-
-
 	private void process() throws InterruptedException {
 
-		ready = false;
-		String message = String.format("worker: %s esta atendiendo a la llamada: %s por la linea %s", "admin",
-				call.getId(), id);
-		System.out.println(message);
+		// ready = false;
+		updateStatus(LineStatus.BUSY.text);
+		System.out.println("Linea " + id + " - Worker " + worker.getName() + ": atendiendo llamada:" + call.getId());
 		Thread.sleep(call.getTime());
-		message = String.format("Finalizada la llamada: %s por la linea %s", call.getId(), id);
-		System.out.println(message);
-		ready = true;
+		System.out.println("Linea " + id + " - Llamada finalizada:" + call.getId());
 
 	}
-	
-	private void updateStatus() {
+
+	private void disconnect() {
+		this.call = null;
+		if (this.worker != null)
+			freeWorkers.add(this.worker);
+		this.worker = null;
+		// ready = true;
+		updateStatus(LineStatus.READY.text);
+
+	}
+
+	private void updateStatus(String status) {
 		LineStatusBean line = this.status.get(this.id);
 		line.setId(String.valueOf(this.id));
 
@@ -75,7 +103,7 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 		else
 			line.setWorker("");
 
-		line.setStatus(String.valueOf(ready));
+		line.setStatus(status);
 
 	}
 
