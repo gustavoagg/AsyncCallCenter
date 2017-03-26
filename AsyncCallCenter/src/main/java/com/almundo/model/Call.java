@@ -4,7 +4,7 @@ public class Call {
 
 	private int id;
 	
-	private long tiempo;
+	private long time;
 
 	public int getId() {
 		return id;
@@ -14,12 +14,12 @@ public class Call {
 		this.id = id;
 	}
 
-	public long getTiempo() {
-		return tiempo;
+	public long getTime() {
+		return time;
 	}
 
-	public void setTiempo(long tiempo) {
-		this.tiempo = tiempo;
+	public void setTime(long time) {
+		this.time = time;
 	}
 
 }

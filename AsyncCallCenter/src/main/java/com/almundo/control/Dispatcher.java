@@ -3,12 +3,12 @@ package com.almundo.control;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Future;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 
+import com.almundo.bean.LineStatusBean;
 import com.almundo.model.Call;
 import com.almundo.model.Worker;
 
@@ -18,20 +18,21 @@ public class Dispatcher {
 	@Autowired
 	ThreadPoolTaskExecutor threadPool;
 
-	List<Future<DispatchWorker>> futureList;
-
 	ConcurrentLinkedQueue<Call> incomingCalls = new ConcurrentLinkedQueue<Call>();
 
 	ConcurrentLinkedQueue<Worker> workerList = new ConcurrentLinkedQueue<Worker>();
 
-	public void init() {
-		futureList = new ArrayList<>();
+	List<LineStatusBean> status = new ArrayList<LineStatusBean>();
 
-		for (int threadNumber = 1; threadNumber < 11; threadNumber++) {
-			DispatchWorker callableTask = new DispatchWorker(String.valueOf(threadNumber), incomingCalls, workerList);
+	public void init() {
+
+		for (int threadNumber = 0; threadNumber < 10; threadNumber++) {
+			status.add(new LineStatusBean());
+			DispatchWorker callableTask = new DispatchWorker(threadNumber, incomingCalls, workerList, status);
 			callableTask.ready = true;
-			Future<DispatchWorker> result = threadPool.submit(callableTask);
-			futureList.add(result);
+			// Future<DispatchWorker> result =
+			threadPool.submit(callableTask);
+			
 			System.out.println("Created Line: " + threadNumber + " ..waiting for calls");
 		}
 
@@ -45,6 +46,10 @@ public class Dispatcher {
 	public synchronized Worker getNextInLine() {
 
 		return workerList.poll();
+	}
+
+	public List<LineStatusBean> getStatus() {
+		return this.status;
 	}
 
 }

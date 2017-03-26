@@ -1,12 +1,18 @@
 package com.almundo.controller;
 
+import java.util.List;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.almundo.bean.LineStatusBean;
 import com.almundo.control.Dispatcher;
 import com.almundo.model.Call;
 
@@ -17,27 +23,39 @@ public class WebCallController {
 	@Autowired
 	Dispatcher dispatcher = new Dispatcher();
 
-	@RequestMapping("/")
-	public String process() {
+	@RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<LineStatusBean>> process() {
 
 		dispatcher.init();
-		return "Open Lines waiting for connection";
+
+		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatus(), HttpStatus.OK);
+
+	}
+	
+	@RequestMapping(value = "/monitor/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<LineStatusBean>> monitor() {
+
+		
+
+		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatus(), HttpStatus.OK);
+
 	}
 
-	@RequestMapping("/calls/{id}")
-	public String makeCalls(@PathVariable("id") int calls) {
+	@RequestMapping(value = "/calls/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<LineStatusBean>> makeCalls(@PathVariable("id") int calls) {
 		String message = "";
 		for (int i = 0; i < calls; i++) {
 			message = message + addCall() + "<br />";
 		}
-		return message;
+		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatus(), HttpStatus.OK);
+
 	}
 
 	private String addCall() {
 		Call call = new Call();
 		callCounter++;
 		call.setId(callCounter);
-		call.setTiempo(randTime());
+		call.setTime(randTime());
 		dispatcher.dispatchCall(call);
 		return "Added call " + callCounter + " to hold calls";
 	}
