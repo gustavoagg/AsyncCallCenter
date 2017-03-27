@@ -98,10 +98,10 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 
 		if (this.call != null) {
 			line.setCall(call.getId());
-			line.setTime(this.call.getTime());
+			line.setTime(String.valueOf((this.call.getTime()/1000))+" seg");
 		} else {
 			line.setCall(0);
-			line.setTime(0);
+			line.setTime("");
 		}
 
 		if (this.worker != null)

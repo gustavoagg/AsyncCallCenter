@@ -17,6 +17,8 @@ public class Worker implements Comparable<Worker> {
 	private Integer calls;
 
 	private Integer level;
+	
+	private boolean active;
 
 	public Integer getLevel() {
 		return level;
@@ -58,5 +60,13 @@ public class Worker implements Comparable<Worker> {
 		
 		return id+ ": "+name.toString()+" - ("+calls.toString()+"-"+level.toString()+")";
 		
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 }

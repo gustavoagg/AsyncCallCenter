@@ -10,7 +10,7 @@ public class LineStatusBean {
 	
 	String status;
 	
-	long time;
+	String time;
 
 	public int getCall() {
 		return call;
@@ -45,12 +45,14 @@ public class LineStatusBean {
 		this.status = status;
 	}
 
-	public long getTime() {
+	public String getTime() {
 		return time;
 	}
 
-	public void setTime(long time) {
+	public void setTime(String time) {
 		this.time = time;
 	}
+
+
 	
 }
