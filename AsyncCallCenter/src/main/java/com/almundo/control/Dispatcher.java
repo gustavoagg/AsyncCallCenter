@@ -38,7 +38,7 @@ public class Dispatcher {
 			workerList = new PriorityBlockingQueue<Worker>(workerService.findAllWorkers());
 			for (int threadNumber = 0; threadNumber < 10; threadNumber++) {
 				statusBeans.add(new LineStatusBean());
-				DispatchWorker callableTask = new DispatchWorker(threadNumber, incomingCalls, workerList, statusBeans);
+				DispatchWorker callableTask = new DispatchWorker(threadNumber, this);
 				threadPool.submit(callableTask);
 				
 				System.out.println("Created Line: " + threadNumber + " ..waiting for calls");
@@ -67,5 +67,7 @@ public class Dispatcher {
 	public ConcurrentLinkedQueue<Call> getIncomingCalls(){
 		return this.incomingCalls;
 	}
+
+
 
 }

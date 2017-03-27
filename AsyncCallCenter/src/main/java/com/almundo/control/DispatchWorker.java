@@ -13,12 +13,14 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 
 	int id;
 	Worker worker;
-	Call call = null;	
+	Call call = null;
 	boolean stop = false;
-	
+
 	ConcurrentLinkedQueue<Call> incomingCalls;
 	PriorityBlockingQueue<Worker> freeWorkers;
 	List<LineStatusBean> status;
+
+	Dispatcher dispatcher;
 
 	public enum LineStatus {
 		ON_HOLD("On Hold"), CONNECTING("Connecting"), READY("Ready"), CLOSED("Closed"), BUSY("Busy");
@@ -30,23 +32,31 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 		}
 	}
 
-	public DispatchWorker(int threadNumber, ConcurrentLinkedQueue<Call> incomingCalls, PriorityBlockingQueue<Worker> workerList,
-			List<LineStatusBean> status) {
+	public DispatchWorker(int threadNumber, ConcurrentLinkedQueue<Call> incomingCalls,
+			PriorityBlockingQueue<Worker> workerList, List<LineStatusBean> status) {
 		this.id = threadNumber;
 		this.incomingCalls = incomingCalls;
 		this.freeWorkers = workerList;
 		this.status = status;
 	}
 
+	public DispatchWorker(int threadNumber, Dispatcher dispatcher) {
+		this.id = threadNumber;
+		this.incomingCalls = dispatcher.incomingCalls;
+		this.freeWorkers = dispatcher.workerList;
+		this.status = dispatcher.statusBeans;
+		this.dispatcher = dispatcher;
+	}
+
 	@Override
 	public DispatchWorker call() throws Exception {
-		updateStatus(LineStatus.CONNECTING.text);
+		updateStatus(LineStatus.CONNECTING.text, null);
 
 		while (!stop) {
 			// Go until app closes, or if its needed to pause the threads
 			if ((this.call = incomingCalls.poll()) != null) {
 				// if there is an incoming call
-				updateStatus(LineStatus.ON_HOLD.text);
+				updateStatus(LineStatus.ON_HOLD.text, null);
 				while (this.worker == null) {
 					// wait until there is a free worker to take the call
 					if ((this.worker = this.freeWorkers.poll()) != null) {
@@ -58,54 +68,74 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 				disconnect();
 
 			} else {
-				Thread.sleep(1000);// delay time to retake another call if
-									// necessary
+				// delay time to re-take another call if necessary
+				Thread.sleep(1000);
+
 			}
 		}
-		updateStatus(LineStatus.CLOSED.text);
+		updateStatus(LineStatus.CLOSED.text, null);
 		return this;
 	}
 
 	private void process() throws InterruptedException {
-
-		// ready = false;
-		updateStatus(LineStatus.BUSY.text);
 		System.out.println("Linea " + id + " - Worker " + worker.getName() + ": atendiendo llamada:" + call.getId());
-		Thread.sleep(call.getTime());
+
+		// Place here the code for processing a call, to simulate I stop the
+		// thread
+		for (int i = (int) (call.getTime() / 1000); i > 0; i--) {
+			updateStatus(LineStatus.BUSY.text, i);
+			Thread.sleep(1000);
+		}
 		System.out.println("Linea " + id + " - Llamada finalizada:" + call.getId());
 
 	}
 
 	private void disconnect() {
+		// IF a logger was needed, this would be a good place to log the call
+
+		// remove assigned call
 		this.call = null;
+
 		workerToQueueList();
-		// ready = true;
-		updateStatus(LineStatus.READY.text);
+		updateStatus(LineStatus.READY.text, null);
 
 	}
 
 	private void workerToQueueList() {
-		if (this.worker != null){
-			this.worker.setCalls(Integer.valueOf(this.worker.getCalls().intValue()+1));
-			freeWorkers.add(this.worker);			
+		if (this.worker != null) {
+			// add one call, to the workers received calls
+			this.worker.setCalls(Integer.valueOf(this.worker.getCalls().intValue() + 1));
+			// update worker on database - 
+			//IMPROVEMENT this could also be done when stopping
+			// the process for better performance
+			
+			Worker temp = dispatcher.workerService.findById(this.worker.getId());
+			temp.setCalls(this.worker.getCalls());
+			dispatcher.workerService.saveWorker(temp);
+			
+			// add worker back to the working queue
+			freeWorkers.add(this.worker);
 		}
 		this.worker = null;
 	}
 
-	private void updateStatus(String status) {
+	private void updateStatus(String status, Integer time) {
 		LineStatusBean line = this.status.get(this.id);
 		line.setId(String.valueOf(this.id));
 
 		if (this.call != null) {
 			line.setCall(call.getId());
-			line.setTime(String.valueOf((this.call.getTime()/1000))+" seg");
+			if (time != null)
+				line.setTime(time + " seg");
+			else
+				line.setTime(String.valueOf((this.call.getTime() / 1000)) + " seg");
 		} else {
 			line.setCall(0);
 			line.setTime("");
 		}
 
 		if (this.worker != null)
-			line.setWorker(this.worker.getName()+" - Atendidas: "+this.worker.getCalls());
+			line.setWorker(this.worker.getName() + " - Atendidas: " + this.worker.getCalls());
 		else
 			line.setWorker("");
 

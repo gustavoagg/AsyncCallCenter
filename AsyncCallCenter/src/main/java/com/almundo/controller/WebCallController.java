@@ -2,7 +2,6 @@ package com.almundo.controller;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,10 @@ import com.almundo.bean.LineStatusBean;
 import com.almundo.control.Dispatcher;
 import com.almundo.model.Call;
 
+/**
+ * @author Gustavo
+ *
+ */
 @RestController
 public class WebCallController {
 	int callCounter = 0;
@@ -24,21 +27,21 @@ public class WebCallController {
 	@Autowired
 	Dispatcher dispatcher = new Dispatcher();
 
-	
 	@RequestMapping(value = "/monitor/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<LineStatusBean>> monitor() {
 		dispatcher.init();
 		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatusBeans(), HttpStatus.OK);
 
 	}
-	
+
 	@RequestMapping(value = "/incoming/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Integer> incomingCalls() {
-		
+
 		return new ResponseEntity<Integer>(new Integer(dispatcher.getIncomingCalls().size()), HttpStatus.OK);
 
 	}
 
+	
 	@RequestMapping(value = "/calls/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<LineStatusBean>> makeCalls(@PathVariable("id") int calls) {
 		String message = "";
@@ -49,6 +52,13 @@ public class WebCallController {
 
 	}
 
+
+	
+	///--------- Internal Utility Methods -----------///
+	
+	/**
+	 * @return a Status indicating the id of the added call, it assigns it to the Dispatcher
+	 */
 	private String addCall() {
 		Call call = new Call();
 		callCounter++;
@@ -58,6 +68,10 @@ public class WebCallController {
 		return "Added call " + callCounter + " to hold calls";
 	}
 
+	
+	/**
+	 * @return Random long value for the call time between 5000 and 10000 in 1000 intervals
+	 */
 	private long randTime() {
 
 		int min = 5;

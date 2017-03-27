@@ -20,6 +20,14 @@ public class Worker implements Comparable<Worker> {
 	
 	private boolean active;
 
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	public Integer getLevel() {
 		return level;
 	}

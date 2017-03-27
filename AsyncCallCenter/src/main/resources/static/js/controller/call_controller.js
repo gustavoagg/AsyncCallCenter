@@ -5,7 +5,7 @@ App.controller('CallController', [
 		'CallService','$interval',
 		function($scope, CallService,$interval) {
 			var self = this;
-			self.ncalls = 10;
+			self.ncalls = 5;
 			self.workers = null;
 			self.lines = null;
 			self.waiting = 0;
@@ -50,27 +50,6 @@ App.controller('CallController', [
 				self.reset();
 			};
 
-			self.remove = function(id) {
-				console.log('id to be deleted', id);
-				if (self.user.id === id) {// clean form if the user to be
-											// deleted is shown there.
-					self.reset();
-				}
-				self.deleteUser(id);
-			};
-
-			self.suggest = function(name) {
-				self.reset();
-				console.log("suggest attributes received");
-				self.user.username = name;
-			};
-
-			self.reset = function() {
-				self.user = {
-					id : null,
-					username : ''
-				};
-				$scope.myForm.$setPristine(); // reset Form
-			};
+			
 
 		} ]);
