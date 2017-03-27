@@ -105,7 +105,7 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 		}
 
 		if (this.worker != null)
-			line.setWorker(this.worker.getName());
+			line.setWorker(this.worker.getName()+" - Atendidas: "+this.worker.getCalls());
 		else
 			line.setWorker("");
 

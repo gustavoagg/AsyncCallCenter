@@ -31,7 +31,7 @@ public class Dispatcher {
 	
 	boolean running = false;
 
-	public void init() {
+	public synchronized void init() {
 
 		if(!running){
 			running = true;
@@ -62,6 +62,10 @@ public class Dispatcher {
 
 	public PriorityBlockingQueue<Worker> getWorkList() {
 		return this.workerList;
+	}
+	
+	public ConcurrentLinkedQueue<Call> getIncomingCalls(){
+		return this.incomingCalls;
 	}
 
 }

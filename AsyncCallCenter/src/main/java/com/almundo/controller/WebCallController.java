@@ -2,6 +2,7 @@ package com.almundo.controller;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,13 @@ public class WebCallController {
 	public ResponseEntity<List<LineStatusBean>> monitor() {
 		dispatcher.init();
 		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatusBeans(), HttpStatus.OK);
+
+	}
+	
+	@RequestMapping(value = "/incoming/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Integer> incomingCalls() {
+		
+		return new ResponseEntity<Integer>(new Integer(dispatcher.getIncomingCalls().size()), HttpStatus.OK);
 
 	}
 

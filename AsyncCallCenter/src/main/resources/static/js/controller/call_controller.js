@@ -17,6 +17,14 @@ App.controller('CallController', [
 					console.error('Error while fetching Lines');
 				});
 			};
+			
+			self.incomingCalls = function() {
+				CallService.incomingCalls().then(function(d) {
+					self.waiting = d;
+				}, function(errResponse) {
+					console.error('Error while getting incoming calls');
+				});
+			};
 
 			self.createCall = function(call) {
 				CallService.createCall(call).then(function(d) {
@@ -32,6 +40,7 @@ App.controller('CallController', [
 
 			var stop = $interval(function() {
 				self.fetchAllLines();
+				self.incomingCalls();
 	          }, 1000);
 			
 

@@ -17,25 +17,18 @@ App.factory('CallService', ['$http', '$q', function($http, $q){
 							);
 			},
 		    
-		    createCall2: function(ncalls){
-					return $http.post('http://localhost:8080/call/', ncalls)
+			incomingCalls: function(){
+					return $http.post('http://localhost:8080/incoming/')
 							.then(
 									function(response){
-
-										console.error('trajo alternativas'+response.data);
+										
 										return response.data;
 									}, 
-									function(errResponse){
-										
-										if(errResponse.data!=null){
-											console.error('Error conflict with User');
-											return errResponse.data;
-										}
-										else{
-											console.error('Error while creating user');
+									function(errResponse){										
+											console.error('Error while obtaining number of incoming calls');
 											return $q.reject(errResponse);
-										}
-										
+
+																																	
 									}
 							);
 		    },
