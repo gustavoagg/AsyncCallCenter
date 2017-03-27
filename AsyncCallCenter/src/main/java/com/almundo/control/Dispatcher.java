@@ -28,16 +28,21 @@ public class Dispatcher {
 	PriorityBlockingQueue<Worker> workerList;
 
 	List<LineStatusBean> statusBeans = new ArrayList<LineStatusBean>();
+	
+	boolean running = false;
 
 	public void init() {
 
-		workerList = new PriorityBlockingQueue<Worker>(workerService.findAllWorkers());
-		for (int threadNumber = 0; threadNumber < 10; threadNumber++) {
-			statusBeans.add(new LineStatusBean());
-			DispatchWorker callableTask = new DispatchWorker(threadNumber, incomingCalls, workerList, statusBeans);
-			threadPool.submit(callableTask);
-			
-			System.out.println("Created Line: " + threadNumber + " ..waiting for calls");
+		if(!running){
+			running = true;
+			workerList = new PriorityBlockingQueue<Worker>(workerService.findAllWorkers());
+			for (int threadNumber = 0; threadNumber < 10; threadNumber++) {
+				statusBeans.add(new LineStatusBean());
+				DispatchWorker callableTask = new DispatchWorker(threadNumber, incomingCalls, workerList, statusBeans);
+				threadPool.submit(callableTask);
+				
+				System.out.println("Created Line: " + threadNumber + " ..waiting for calls");
+			}
 		}
 	}
 

@@ -26,9 +26,7 @@ public class WebCallController {
 	
 	@RequestMapping(value = "/monitor/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<LineStatusBean>> monitor() {
-		if(dispatcher.getWorkList()==null){
-			dispatcher.init();
-		}
+		dispatcher.init();
 		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatusBeans(), HttpStatus.OK);
 
 	}

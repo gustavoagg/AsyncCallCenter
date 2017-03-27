@@ -8,6 +8,7 @@ App.controller('CallController', [
 			self.ncalls = 10;
 			self.workers = null;
 			self.lines = null;
+			self.waiting = 0;
 
 			self.fetchAllLines = function() {
 				CallService.fetchAllLines().then(function(d) {

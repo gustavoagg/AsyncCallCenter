@@ -71,7 +71,7 @@ $(function () {
 							</div>
 						</div>
 					</div>
-
+Llamadas en espera :<span  ng-bind="ctrl.waiting"></span>
 
 					<div class="row">
 						<div class="form-actions floatRight">
