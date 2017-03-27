@@ -23,20 +23,12 @@ public class WebCallController {
 	@Autowired
 	Dispatcher dispatcher = new Dispatcher();
 
-	@RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<LineStatusBean>> process() {
-
-		dispatcher.init();
-		makeCalls(20);
-		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatusBeans(), HttpStatus.OK);
-
-	}
 	
 	@RequestMapping(value = "/monitor/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<LineStatusBean>> monitor() {
-
-		
-
+		if(dispatcher.getWorkList()==null){
+			dispatcher.init();
+		}
 		return new ResponseEntity<List<LineStatusBean>>(dispatcher.getStatusBeans(), HttpStatus.OK);
 
 	}

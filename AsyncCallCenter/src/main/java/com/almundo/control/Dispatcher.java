@@ -55,4 +55,8 @@ public class Dispatcher {
 		return this.statusBeans;
 	}
 
+	public PriorityBlockingQueue<Worker> getWorkList() {
+		return this.workerList;
+	}
+
 }
