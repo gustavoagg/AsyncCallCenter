@@ -72,7 +72,7 @@ public class WebCallController {
 	/**
 	 * @return Random long value for the call time between 5000 and 10000 in 1000 intervals
 	 */
-	private long randTime() {
+	public static long randTime() {
 
 		int min = 5;
 		int max = 10;
