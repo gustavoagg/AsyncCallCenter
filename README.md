@@ -28,8 +28,10 @@ Proceso de atención de llamadas con manejo Asincrono, empleando Spring-Boot, Th
  Para mayor información sobre la logica, se puede revisar en el repositorio la carpeta UML, donde se encuentra el diagrama de clases y
  algunos diagramas de secuencia con notas explicativas.
  
- NOTA: Se puede consultar el estado de la tabla de los trabajadores accesando a la siguiente ruta:  `http://localhost:8080/h2-console/` 
- y colocando el siguiente JDBC URL: `jdbc:h2:mem:testdb` y presionando "Connect"
+ NOTA: Se puede consultar el estado de la tabla de los trabajadores accesando de la siguiente forma: 
+ - http://localhost:8080/h2-console/ 
+ - Colocando el siguiente JDBC URL: `jdbc:h2:mem:testdb` 
+ - User Name: `sa` y presionando "Connect"
  
  ## Extras Solicitados
  - Cuando no hay empleado libre: para esto se implementó que automaticamente todas las llamadas al generarse pasan a una lista de espera y 
