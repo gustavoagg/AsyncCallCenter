@@ -48,6 +48,9 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 		this.dispatcher = dispatcher;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.util.concurrent.Callable#call()
+	 */
 	@Override
 	public DispatchWorker call() throws Exception {
 		updateStatus(LineStatus.CONNECTING.text, null);
@@ -77,6 +80,11 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 		return this;
 	}
 
+	/**
+	 * Its call when the call is assigned to a worker, and it simulates the time of the call
+	 * also, updates the line status each second
+	 * @throws InterruptedException
+	 */
 	private void process() throws InterruptedException {
 		System.out.println("Linea " + id + " - Worker " + worker.getName() + ": atendiendo llamada:" + call.getId());
 
@@ -90,6 +98,10 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 
 	}
 
+	/**
+	 * It clears the call from the line, and reassigns the worker to the queue,
+	 *  and updates the line status
+	 */
 	private void disconnect() {
 		// IF a logger was needed, this would be a good place to log the call
 
@@ -101,6 +113,10 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 
 	}
 
+	/**
+	 * Adds a new received call to the workers registry in the DB, 
+	 * reassigns it the waiting queue and clears the worker from the line
+	 */
 	private void workerToQueueList() {
 		if (this.worker != null) {
 			// add one call, to the workers received calls
@@ -119,6 +135,12 @@ public class DispatchWorker implements Callable<DispatchWorker> {
 		this.worker = null;
 	}
 
+	/**
+	 * @param status current status given by the LineStatus Enum
+	 * @param time remaining call time
+	 * 
+	 * Updates the status of the connection between the call and a worker 
+	 */
 	private void updateStatus(String status, Integer time) {
 		LineStatusBean line = this.status.get(this.id);
 		line.setId(String.valueOf(this.id));

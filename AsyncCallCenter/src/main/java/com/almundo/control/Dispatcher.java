@@ -31,6 +31,12 @@ public class Dispatcher {
 	
 	boolean running = false;
 
+	/**
+	 * Initializes all the working queues and the Threads using DispatchWorkers
+	 */
+	/**
+	 * 
+	 */
 	public synchronized void init() {
 
 		if(!running){
@@ -46,6 +52,11 @@ public class Dispatcher {
 		}
 	}
 
+	/**
+	 * @param call call to be added
+	 * 
+	 * Adds call to the incoming calls list, so the DispatchWorkers get to connect them with the workers
+	 */
 	public void dispatchCall(Call call) {
 		System.out.println("New call incoming: " + call.getId() + " ..on hold");
 		incomingCalls.add(call);
